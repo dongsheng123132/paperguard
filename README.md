@@ -1,3 +1,15 @@
+---
+title: PaperGuard 论文体检
+emoji: 🛡️
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+app_port: 7860
+pinned: false
+license: mit
+short_description: 开源学术论文体检 — 统计错误 / 数字雷同 / 图片复用
+---
+
 # PaperGuard 论文体检 · 开源学术造假检测工具
 
 > 给一篇论文,自动找出**可疑的统计错误、数据雷同、图片复用**等问题。
@@ -6,7 +18,15 @@
 >
 > **定位**: 提出质疑、不下定论。所有报告附置信度,辅助人工复核,不替代同行评审。
 
-## 现阶段能做什么(v0.2)
+## ⚠️ 重要免责声明
+
+1. 本工具输出 **"疑似"** 而非 **"定罪"**。命中即可疑,**不等于造假**;未命中也**不等于无问题**。
+2. 任何争议必须以**原始数据复核**为准。作者可能在论文里做了正当的舍入/简化/数据加工。
+3. **请勿将本工具的输出作为公开指控他人学术不端的依据**。如需举报,请走期刊、机构、PubPeer 等正规渠道。
+4. 上传他人论文请确认**不侵犯版权**。本服务**不存储**用户上传的 PDF,跑完即弃。
+5. 本工具按"现状"提供,不对检测结果的准确性、完整性作任何保证。使用者自行承担一切责任。
+
+## 现阶段能做什么(v0.3)
 
 **文本统计层**
 - ✅ **StatCheck**: t/F/χ²/r 与 p 值自洽,标决策反转
@@ -45,14 +65,14 @@ python -m cases.benchmark
 合成样本上当前指标: **precision 100% · recall 100% · F1 100%**
 (5 个合成假/干净样本 · 真实退稿案例待 PDF 就绪)
 
-## 快速开始
+## 本地运行
 
 ```bash
 # 1. 安装依赖
 pip install -r requirements.txt
 
 # 2. 命令行体检
-python -m paperguard check samples/demo.pdf
+python -m paperguard check samples/demo_fraud.pdf
 
 # 3. Web 体检
 streamlit run paperguard/web/app.py
@@ -67,9 +87,14 @@ paperguard/
   report/       # JSON / Markdown / HTML 报告渲染
   web/          # Streamlit 上传界面
   tests/        # pytest 用例
+cases/          # 真实退稿论文回测框架
 samples/        # 论文样本(测试用)
 ```
 
-## 免责声明
+## 在线体验
 
-本工具输出 **"疑似"** 而非 **"定罪"**。任何争议必须以原始数据复核为准,作者也可能在论文里报告了正当的舍入/简化。请理性使用。
+- 🤗 Hugging Face Spaces (本仓库自动部署)
+
+## License
+
+MIT — 见 `LICENSE`。
