@@ -13,6 +13,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
+# 让 Streamlit 能 import 顶层 paperguard 包
+ENV PYTHONPATH=/app
+
 # HF Spaces 要求监听 7860
 EXPOSE 7860
 
