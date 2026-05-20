@@ -133,7 +133,7 @@ def _scan(doc: Document, jaccard_threshold: float = 0.6, min_overlap: int = 5) -
             )
             if consec:
                 detail += f" 其中 {consec[0]} 个数字连续完全一致: {consec[1][:8]}"
-            detail += "。可能是同一份数据被改写复用或对照组造假。"
+            detail += "。可能是同一份数据被改写复用,或对照组数据存在异常,建议人工核对原始记录。"
             out.append(
                 Finding(
                     detector=DETECTOR,

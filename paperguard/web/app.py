@@ -17,8 +17,9 @@ st.set_page_config(page_title="PaperGuard 论文体检", page_icon="🛡️", la
 
 st.title("🛡️ PaperGuard · 论文体检")
 st.caption(
-    "开源学术造假自检工具 — 给一份 PDF/TXT,自动找出统计错误、数字雷同、可疑模式。"
-    "灵感来自 PubPeer、Elisabeth Bik、耿同学。"
+    "给一份 PDF/TXT,自动扫描**统计自洽性、数字一致性、图片完整性**的潜在问题。"
+    "灵感来自 PubPeer、Elisabeth Bik、耿同学讲故事。"
+    "**定位**:辅助人工复核的疑点清单,不替代同行评审,不作为指控依据。"
 )
 
 with st.expander("⚠️ 使用前必读 · 免责声明", expanded=False):
@@ -44,9 +45,9 @@ with st.sidebar:
     st.header("使用方式")
     st.markdown(
         """
-        1. **上传你自己的论文**: 投稿前自检,避免笔误
-        2. **上传他人论文**: 学习/复核/打假参考
-        3. 报告会列出可疑点 + 置信度,**不是定罪**
+        1. **上传你自己的论文**: 投稿前体检,避免笔误
+        2. **上传他人论文**: 学习 / 复核 / 同行评审辅助
+        3. 报告会列出可疑点 + 置信度,**仅供参考,不作定论**
         """
     )
     st.divider()
@@ -57,7 +58,7 @@ with st.sidebar:
         - **grim** — 均值与样本量的整数自洽
         - **dup_numbers** — 段落间数字雷同
         - **image_dup** — 图片复用 (pHash + ORB,含翻转)
-        - **wb_clone** — 单图内 copy-move (WB 条带造假)
+        - **wb_clone** — 单图内 copy-move(WB 条带完整性)
         """
     )
     st.divider()

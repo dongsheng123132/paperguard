@@ -54,7 +54,7 @@ def _print_summary(report) -> None:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(prog="paperguard", description="开源论文造假体检")
+    parser = argparse.ArgumentParser(prog="paperguard", description="开源论文稳健性体检 — 统计 / 数字 / 图片一致性扫描")
     sub = parser.add_subparsers(dest="cmd", required=True)
     p_check = sub.add_parser("check", help="对论文执行体检")
     p_check.add_argument("path", help="PDF / TXT 文件路径")

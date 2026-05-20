@@ -49,7 +49,7 @@ def to_markdown(report: Report) -> str:
     ]
 
     if not report.findings:
-        lines.append("✅ 没有命中已知造假模式。")
+        lines.append("✅ 未命中已知风险模式。这不等同于论文完全无问题,仅说明本工具未发现。")
         return "\n".join(lines)
 
     # 按检测器分组

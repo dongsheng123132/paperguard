@@ -135,7 +135,7 @@ def _scan(images: list[ExtractedImage], hash_thr: int = 10, orb_thr: int = 15) -
                         f"P{a.image.page}#{a.image.index} 与 P{b.image.page}#{b.image.index} "
                         f"pHash 距离 {dist} (≤8 视觉相同),ORB 几何内点 {inliers}。"
                         + (f" 命中变换: {_VARIANT_NAME[variant]}。" if variant else "")
-                        + "WB/显微镜图同图复用是常见造假手段。"
+                        + "WB / 显微镜图的同图复用是常见的图像完整性问题,建议人工复核原图。"
                     ),
                     snippet="",
                     page=a.image.page,
