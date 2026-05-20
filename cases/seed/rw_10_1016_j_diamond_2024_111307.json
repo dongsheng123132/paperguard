@@ -1,0 +1,30 @@
+{
+  "id": "rw_10_1016_j_diamond_2024_111307",
+  "title": "Hydrothermal fabrication of ZnTe/g-CN nanocomposite for supercapacitor application",
+  "doi": "10.1016/j.diamond.2024.111307",
+  "year": 2024,
+  "journal": "Diamond and Related Materials",
+  "verdict": "retracted",
+  "sources": [
+    {
+      "type": "retraction_watch",
+      "url": "https://retractionwatch.com/?s=10.1016/j.diamond.2024.111307"
+    },
+    {
+      "type": "doi",
+      "url": "https://doi.org/10.1016/j.diamond.2024.111307"
+    }
+  ],
+  "known_issues": [
+    {
+      "category": "rw_reason",
+      "desc": "Concerns/Issues about Image;Investigation by Journal/Publisher;Investigation by Third Party;Manipulation of Images;Objections by Author(s);Unreliable Results and/or Conclusions;"
+    }
+  ],
+  "expected_detectors": [
+    "image_dup",
+    "wb_clone"
+  ],
+  "pdf_path": "cases/pdfs/rw_10_1016_j_diamond_2024_111307.pdf",
+  "notes": "PDF 由使用者通过合法渠道(机构订阅 / 开放获取版本)获取后放到 pdf_path"
+}

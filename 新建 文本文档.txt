@@ -1,0 +1,217 @@
+找谁是这个跟同学去做一个呃，学术造假的一个工具，就是去审视打假啊，就谁是打假。学术打假。。
+如果你还有关于工具开发的具体细节（比如技术选型、功能优先级、数据来源等），或者想进一步探讨某模块的优化方向，都可以随时问我。如果你想开发一个检测论文造假的工具，结合**图片查重**和**数据一致性检测**这两个核心方向，我可以帮你梳理技术架构和实现路径，以下是分模块的详细方案：
+
+
+### 一、工具整体架构
+```
+用户上传论文（PDF/Word）→ 模块1：图片提取与查重 → 模块2：数据提取与一致性分析 → 生成检测报告
+```
+
+
+### 二、模块1：图片查重（同图复用、篡改检测）
+#### 1. 技术原理
+- **特征提取**：用CNN（卷积神经网络）提取图片的纹理、边缘、像素分布特征，生成特征向量。
+- **相似度匹配**：计算不同图片特征向量的余弦相似度，超过阈值则判定为疑似重复。
+- **篡改检测**：分析图片的像素连续性、亮度均匀性、边缘断层，识别拼接/克隆痕迹。
+
+#### 2. 实现步骤
+- **步骤1：论文图片提取**
+  - 用Python库`PyPDF2` `fitz`（PyMuPDF）解析PDF，提取所有嵌入图片。
+  - 代码示例：
+    ```python
+    import fitz
+    def extract_images(pdf_path):
+        doc = fitz.open(pdf_path)
+        images = []
+        for page in doc:
+            for img in page.get_images():
+                xref = img[0]
+                pix = fitz.Pixmap(doc, xref)
+                images.append(pix.tobytes())  # 转为字节流用于后续处理
+        return images
+    ```
+
+- **步骤2：特征提取与相似度计算**
+  - 用预训练模型（如`ResNet18`截掉全连接层）提取特征，再用余弦相似度对比。
+  - 代码示例（基于PyTorch）：
+    ```python
+    import torch
+    import torchvision.models as models
+    import torchvision.transforms as transforms
+    from PIL import Image
+    import numpy as np
+
+    # 加载预训练模型（提取特征用）
+    model = models.resnet18(pretrained=True)
+    model = torch.nn.Sequential(*(list(model.children())[:-1]))  # 去掉最后一层全连接
+    model.eval()
+
+    # 图片预处理
+    transform = transforms.Compose([
+        transforms.Resize(256),
+        transforms.CenterCrop(224),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    ])
+
+    def get_image_feature(img_bytes):
+        img = Image.open(img_bytes).convert('RGB')
+        img_tensor = transform(img).unsqueeze(0)
+        with torch.no_grad():
+            feature = model(img_tensor).squeeze().numpy()
+        return feature
+
+    # 计算两张图片的相似度
+    def calc_similarity(feat1, feat2):
+        return np.dot(feat1, feat2) / (np.linalg.norm(feat1) * np.linalg.norm(feat2))
+    ```
+
+- **步骤3：篡改检测（可选）**
+  - 用`OpenCV`分析图片的**边缘检测、直方图、像素方差**，识别拼接痕迹。
+  - 代码示例：
+    ```python
+    import cv2
+    def detect_tampering(img_bytes):
+        img = cv2.imdecode(np.frombuffer(img_bytes, np.uint8), cv2.IMREAD_COLOR)
+        # 边缘检测（看是否有断层）
+        edges = cv2.Canny(img, 100, 200)
+        # 直方图分析（看亮度是否均匀）
+        hist = cv2.calcHist([img], [0], None, [256], [0, 256])
+        # 这里可以加阈值判断，比如边缘不连续、直方图异常则标记为篡改
+        return {"edge_discontinuity": edges.var() > 100, "histogram_abnormal": hist.var() > 5000}
+    ```
+
+
+### 三、模块2：数据一致性检测（数值雷同、统计异常）
+#### 1. 技术原理
+- **数据提取**：从图表中提取数值（如折线图、柱状图、表格）。
+- **一致性分析**：计算不同图表、不同数据组的相关性、重复率。
+- **统计校验**：检查p值、均值、样本量的逻辑自洽性。
+
+#### 2. 实现步骤
+- **步骤1：图表数据提取**
+  - 用`WebPlotDigitizer`的Python封装（或`DataThief`自动化）提取图表数值。
+  - 代码示例（以`WebPlotDigitizer`自动化为例）：
+    ```python
+    # 注意：需先安装WebPlotDigitizer并启动本地服务
+    import requests
+    def extract_plot_data(img_path, axes):
+        # axes为坐标轴范围，如{"x_min":0, "x_max":10, "y_min":0, "y_max":100}
+        url = "http://localhost:8000/api/digitize"
+        files = {"image": open(img_path, 'rb')}
+        data = {"axes": axes}
+        response = requests.post(url, files=files, data=data)
+        return response.json()["data"]  # 返回提取的数值列表
+    ```
+
+- **步骤2：数据一致性分析**
+  - 计算不同数据集的**皮尔逊相关系数、重复值占比**。
+  - 代码示例：
+    ```python
+    import numpy as np
+    def check_data_consistency(data1, data2):
+        # 计算相关系数
+        corr = np.corrcoef(data1, data2)[0, 1]
+        # 计算重复值占比
+        common = len(set(data1) & set(data2)) / max(len(data1), len(data2))
+        return {"correlation": corr, "duplication_ratio": common}
+    ```
+
+- **步骤3：统计校验（可选）**
+  - 用`statcheck`库检查论文中的统计量（如t值、p值）是否自洽。
+  - 代码示例：
+    ```python
+    from statcheck import statcheck
+    def check_statistics(text):
+        # text为论文正文文本，包含统计描述（如t(20)=3.2, p<0.01）
+        results = statcheck(text)
+        return results  # 返回统计量是否合理的校验结果
+    ```
+
+
+### 四、工具整合与报告生成
+- 将两个模块的结果整合，生成**疑似造假点列表 + 置信度评分**。
+- 用`Streamlit`或`Flask`做前端界面，支持用户上传论文并查看报告。
+
+
+### 五、落地建议
+1. **先聚焦细分领域**：比如先做生物医学论文的WB图查重 + 统计数据校验，场景更明确。
+2. **数据积累是关键**：可以先爬取PubPeer、Retraction Watch上的已知造假论文，建立“负样本库”用于模型训练/校验。
+3. **合规性**：注意论文版权，避免直接存储用户上传的论文内容，仅做临时分析。
+
+
+如果需要某部分的更细节代码（比如图片特征提取的优化、数据提取的精度提升），可以再针对性展开~
+
+你问的正是“耿同学”这类打假博主的核心方法：**图片查重 + 数字统计异常检测**。我把整套可复现的方法和原理讲清楚。
+
+### 一、图片/图表造假检测（最常用）
+**1. 图片重复比对（同图多用）**
+- **原理**：用算法提取图片特征（纹理、像素、条带、细胞轮廓），跨图比对相似度。
+- **常见造假**：
+  - 同一张 WB 条带、荧光图、显微镜图，改标签当不同组数据。
+  - 局部复制粘贴（克隆细胞、条带、背景）。
+- **检测方法**
+  - **工具**：ImageTwin、MedPeer、Photoshop 差值层、RetractionWatch 插件。
+  - **操作**：
+    1. 把论文所有图批量上传。
+    2. 系统自动做**全局相似度 + 局部特征点匹配**。
+    3. 用**叠图、闪烁对比、染色标记**看重合区。
+    4. Photoshop 叠两层开“差值”：**全黑=完全重复**。
+
+
+**2. 图片篡改/拼接检测**
+- 检查**不均匀亮度、边缘断层、克隆痕迹、像素不连续**。
+- 工具：Adobe 分析、ImageJ、Fiji 看直方图与纹理异常。
+
+### 二、数字数据造假检测（你提到的“数据雷同”）
+**1. 跨图表数据一致性校验（核心）**
+- **异常点**：
+  - 两种完全无关数据（如基因表达量、肿瘤体积）**曲线/数值几乎一样**，连小数都相同。
+  - 不同组别、不同时间点数据**完美重复、无随机波动**。
+- **方法**
+  - 从图中**提取数值**（DataThief、WebPlotDigitizer）。
+  - 做**相关性、欧氏距离、余弦相似度**。
+  - 相关系数接近 **1.0** 基本可判定造假。
+
+**2. 统计规律异常（Too Perfect）**
+- **特征**：
+  - 数据**过于整齐、无误差、无波动**。
+  - 均值、标准差、样本量明显矛盾。
+  - p 值、t 值、F 值**计算错误或伪造**。
+- **工具**
+  - **StatCheck**：自动检查论文内 p 值、统计量是否正确。
+  - **GRIM Test**：检验均值与样本量是否逻辑自洽。
+  - **异常值/分布检验**：正态性、方差齐性、重复模式。
+
+**3. 内部逻辑矛盾**
+- 图表数 ≠ 正文描述
+- 总和 ≠ 分项之和
+- 增长率、趋势前后冲突
+
+### 三、完整检测流程（可直接套用）
+1. **图片全量查重**
+   - 上传 PDF → 提取所有图 → 两两比对 → 标记重复。
+2. **数据提取与一致性**
+   - 抽关键图表 → 数字化 → 跨图相关性 → 高相关即可疑。
+3. **统计校验**
+   - StatCheck、GRIM、分布检验。
+4. **原始数据追溯**
+   - 索要原始记录、胶片、流式文件、实验日志。
+5. **同行/社区复核**
+   - PubPeer 发表质疑 → 作者回应 → 学术调查。
+
+### 四、你看到的中山大案典型疑点
+- **图片**：Fig 2H/2D/2I 高度相似 → 图片查重直接命中。
+- **数字**：两类完全不同数据**曲线/小数完全重合** → 一致性检验 **r≈1**。
+- **解释**：只承认“图片误用”、回避数字问题 → 典型心虚表现。
+
+### 五、常用工具清单
+- **图片**：ImageTwin、MedPeer、Photoshop（差值层）
+- **数据提取**：DataThief、WebPlotDigitizer
+- **统计**：StatCheck、GRIM、R/Python 相关分析
+- **社区**：PubPeer、Retraction Watch
+
+要不要我给你一套可直接复制的 **Python 图片查重 + 数据一致性检测代码**，你拿去就能自己扫论文？
+
+
+7.43 复制打开抖音，看看【耿同学讲故事的作品】又是中山大学！生科院副院长代表作，造假！ 不是科研... https://v.douyin.com/xw3UR8HF-xU/ 10/03 N@j.ca :3pm tEU:/

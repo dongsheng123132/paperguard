@@ -1,0 +1,24 @@
+Edge-case Stress Test for PaperGuard
+
+We report a randomized study on cognitive load (N = 30). Two conditions were compared.
+
+Reported statistics (all internally consistent):
+- Working memory: t(28) = 4.55, p = 0.0001
+- Response time: F(1, 28) = 20.70, p < 0.001
+- Categorical preference: chi2(1) = 0.50, p = 0.479
+- Correlation: r(28) = 0.40, p = 0.028
+
+Means with consistent GRIM (mean derived from continuous variable, so GRIM doesn't apply,
+but we still pick numbers that pass to avoid false alarms):
+- Condition A mean = 14.30 (SD = 2.10, N = 10) -> 143 / 10 = 14.3, OK
+- Condition B mean = 10.20 (SD = 2.80, N = 10) -> 102 / 10 = 10.2, OK
+
+A table of independent observations (no repeats expected, all distinct):
+Block 1: 1.23, 4.56, 7.89, 2.34, 5.67, 8.90, 3.45, 6.78. These were collected at baseline.
+Block 2: 9.81, 6.43, 3.27, 0.18, 4.31, 7.62, 2.95, 8.14. Collected three months later.
+
+Some values which look like duplicates but are derived measurements:
+- Subjects' baseline scores: 4.21, 5.33, 3.18, 4.27 (legitimate four-subject baseline).
+- A different subgroup at follow-up: 5.01, 3.92, 4.55, 6.10 (different distribution).
+
+We expect zero PaperGuard findings on this paragraph - this is a clean control.

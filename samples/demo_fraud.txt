@@ -1,0 +1,27 @@
+A Pilot Study on Adolescent Math Anxiety and Test Scores
+
+Abstract
+We surveyed 24 high-school students using a 1-7 Likert scale on math anxiety and
+related their scores to final exam outcomes. The reported mean anxiety score was
+4.27 (SD = 1.10, N = 24). A treatment group of 17 students underwent a mindfulness
+intervention and reported a post-treatment mean of 3.83 (SD = 0.91, N = 17).
+
+Methods
+All 24 students completed a 10-item anxiety inventory scored 1-7 per item. Final
+exam scores were collected from the school registrar.
+
+Results
+Math anxiety was significantly correlated with exam scores, r(22) = 0.34, p = 0.001.
+The intervention significantly reduced anxiety, t(16) = 2.05, p = 0.012.
+A one-way ANOVA confirmed group differences, F(2, 21) = 1.20, p < 0.01.
+A chi-square test of independence on coping style yielded chi2(3) = 7.81, p = 0.001.
+Pearson correlation between anxiety and exam scores in subgroup A was r(15) = 0.92, p = 0.300.
+
+Subgroup descriptive table:
+Group A scores: 4.21, 5.33, 3.18, 4.27, 5.10, 3.92, 4.55, 5.01.
+Group B scores: 4.21, 5.33, 3.18, 4.27, 5.10, 3.92, 4.55, 5.01.
+
+Discussion
+These findings broadly align with prior literature on math anxiety. We note that
+the intervention effect, while statistically significant, may reflect ceiling
+artifacts in the inventory.

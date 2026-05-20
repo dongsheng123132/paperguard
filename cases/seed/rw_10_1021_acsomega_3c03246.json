@@ -1,0 +1,32 @@
+{
+  "id": "rw_10_1021_acsomega_3c03246",
+  "title": "Synthesis and Performance of Two New Amphiphilic Ionic Liquids for Demulsification of Water-in-Crude Oil Emulsions",
+  "doi": "10.1021/acsomega.3c03246",
+  "year": 2023,
+  "journal": "ACS Omega",
+  "verdict": "retracted",
+  "sources": [
+    {
+      "type": "retraction_watch",
+      "url": "https://retractionwatch.com/?s=10.1021/acsomega.3c03246"
+    },
+    {
+      "type": "doi",
+      "url": "https://doi.org/10.1021/acsomega.3c03246"
+    }
+  ],
+  "known_issues": [
+    {
+      "category": "rw_reason",
+      "desc": "Duplication of Data;Duplication of/in Image;Manipulation of Data;Manipulation of Images;"
+    }
+  ],
+  "expected_detectors": [
+    "dup_numbers",
+    "grim",
+    "image_dup",
+    "wb_clone"
+  ],
+  "pdf_path": "cases/pdfs/rw_10_1021_acsomega_3c03246.pdf",
+  "notes": "PDF 由使用者通过合法渠道(机构订阅 / 开放获取版本)获取后放到 pdf_path"
+}

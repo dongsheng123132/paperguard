@@ -1,0 +1,10 @@
+{
+  "id": "synthetic_clean_control",
+  "title": "PaperGuard 干净对照样本 — 用来测 false positive",
+  "verdict": "clean_control",
+  "sources": [],
+  "known_issues": [],
+  "expected_detectors": [],
+  "text_path": "samples/demo_clean.txt",
+  "notes": "如果在这上面命中,就是 false positive"
+}

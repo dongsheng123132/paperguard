@@ -1,0 +1,10 @@
+{
+  "id": "synthetic_dense_clean",
+  "title": "密集统计干净样本 — 60 名受试者,大量 t/F/χ²/r 都自洽",
+  "verdict": "clean_control",
+  "sources": [],
+  "known_issues": [],
+  "expected_detectors": [],
+  "text_path": "samples/demo_dense_clean.txt",
+  "notes": "应保持 0 命中"
+}
