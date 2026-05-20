@@ -11,7 +11,8 @@ htmlcov/
 # 用户上传 / 第三方论文 PDF — 版权与隐私
 cases/pdfs/
 *.pdf
-!samples/demo_fraud.pdf
+# demo_fraud.pdf 不进 git,可由 samples/make_fraud_pdf.py 现场生成
+# (HF Spaces 拒绝 git 里的二进制,必须排除)
 
 # Retraction Watch 缓存(8MB+,可重新下载)
 cases/rw_cache.csv
