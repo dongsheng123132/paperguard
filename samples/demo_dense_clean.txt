@@ -1,0 +1,33 @@
+Dense Clean Paper: Realistic Statistical Reporting
+
+This paper presents a 2x2 factorial trial of attention training in adults.
+
+Participants and Design
+Sixty adults (N = 60, 30 per condition) completed pre/post tests.
+
+Demographics
+- Age (continuous): mean = 24.50 (SD = 3.10, N = 60). Note: continuous variable, GRIM not applicable.
+- Years of education: mean = 16.20 (SD = 2.40, N = 60). Continuous variable.
+- Baseline working memory: mean = 7.20 (SD = 1.50, N = 60). Continuous variable.
+
+Pre-test Outcomes
+- Group A pretest mean = 50.10 (SD = 8.20, N = 30) -> 1503 / 30 = 50.1, OK
+- Group B pretest mean = 51.30 (SD = 7.50, N = 30) -> 1539 / 30 = 51.3, OK
+
+Inferential Statistics (all internally consistent)
+Pretest groups did not differ, t(58) = 0.62, p = 0.538.
+Main effect of training was significant, F(1, 56) = 12.34, p = 0.001.
+Time x Group interaction, F(1, 56) = 5.67, p = 0.021.
+Correlation between baseline and improvement, r(58) = 0.38, p = 0.003.
+Categorical handedness balance: chi2(1) = 0.04, p = 0.842.
+
+Descriptive table (block A vs B, all distinct numbers)
+Block A baseline: 48.10, 52.30, 49.20, 51.50, 50.40, 53.10, 47.80, 50.90.
+Block A post:     53.40, 56.10, 54.80, 57.20, 55.30, 58.40, 53.90, 56.70.
+Block B baseline: 51.10, 49.80, 52.40, 50.30, 51.90, 52.80, 50.10, 51.50.
+Block B post:     52.40, 50.30, 53.10, 51.80, 52.60, 53.50, 51.10, 52.30.
+
+Notes on numerical conventions
+Some numbers like 51.30 may repeat across rows because both groups have similar means;
+this is normal experimental data and should NOT trigger PaperGuard. The detector should
+distinguish between "shared numbers due to similar measurements" and "verbatim copy-paste".

@@ -1,0 +1,16 @@
+Effect of Sleep Duration on Memory Recall: A Small RCT
+
+Abstract
+We randomly assigned 30 participants to short (5h) vs normal (8h) sleep conditions
+and measured next-day recall performance on a 20-item list. The mean recall in the
+normal-sleep group was 14.3 (SD = 2.1, N = 15) versus 10.2 (SD = 2.8, N = 15) in
+the short-sleep group.
+
+Results
+The normal-sleep group recalled significantly more items, t(28) = 4.55, p = 0.0001.
+The effect was robust across age strata, F(1, 28) = 20.70, p < 0.001.
+We found no main effect of order, chi2(1) = 0.50, p = 0.479.
+
+Discussion
+Consistent with prior work, sleep deprivation impaired recall in this small cohort.
+Limitations include the modest sample size and self-reported sleep duration.

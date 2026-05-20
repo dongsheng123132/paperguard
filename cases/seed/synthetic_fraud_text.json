@@ -1,0 +1,14 @@
+{
+  "id": "synthetic_fraud_text",
+  "title": "PaperGuard 内置合成样本 — 含 5 处统计反转 + GRIM + 数字雷同",
+  "verdict": "synthetic",
+  "sources": [],
+  "known_issues": [
+    {"category": "statcheck", "desc": "t/F/χ²/r 与 p 多处不一致并决策反转"},
+    {"category": "grim", "desc": "Mean=4.27 N=24 不可由整数计数得到"},
+    {"category": "dup_numbers", "desc": "Group A 与 Group B 完全相同 8 个数值"}
+  ],
+  "expected_detectors": ["statcheck", "grim", "dup_numbers"],
+  "text_path": "samples/demo_fraud.txt",
+  "notes": "PaperGuard 自带的合成假论文,用于回归测试"
+}

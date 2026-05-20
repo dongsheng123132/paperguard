@@ -1,0 +1,30 @@
+{
+  "id": "rw_10_1096_fj_06_7581com",
+  "title": "EP2 Prostanoid Receptor Promotes Squamous Cell Carcinoma Growth through Epidermal Growth Factor Receptor Transactivation and iNOS and ERK1/2 Pathways",
+  "doi": "10.1096/fj.06-7581com",
+  "year": 2007,
+  "journal": "FASEB Journal",
+  "verdict": "retracted",
+  "sources": [
+    {
+      "type": "retraction_watch",
+      "url": "https://retractionwatch.com/?s=10.1096/fj.06-7581com"
+    },
+    {
+      "type": "doi",
+      "url": "https://doi.org/10.1096/fj.06-7581com"
+    }
+  ],
+  "known_issues": [
+    {
+      "category": "rw_reason",
+      "desc": "Concerns/Issues about Image;Duplication of/in Image;Investigation by Journal/Publisher;Investigation by Third Party;Manipulation of Images;Objections by Author(s);Unreliable Results and/or Conclusions;"
+    }
+  ],
+  "expected_detectors": [
+    "image_dup",
+    "wb_clone"
+  ],
+  "pdf_path": "cases/pdfs/rw_10_1096_fj_06_7581com.pdf",
+  "notes": "PDF 由使用者通过合法渠道(机构订阅 / 开放获取版本)获取后放到 pdf_path"
+}

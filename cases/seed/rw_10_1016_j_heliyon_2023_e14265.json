@@ -1,0 +1,30 @@
+{
+  "id": "rw_10_1016_j_heliyon_2023_e14265",
+  "title": "MiR-1281 is involved in depression disorder and the antidepressant effects of Kai-Xin-San by targeting ADCY1 and DVL1",
+  "doi": "10.1016/j.heliyon.2023.e14265",
+  "year": 2023,
+  "journal": "Heliyon",
+  "verdict": "retracted",
+  "sources": [
+    {
+      "type": "retraction_watch",
+      "url": "https://retractionwatch.com/?s=10.1016/j.heliyon.2023.e14265"
+    },
+    {
+      "type": "doi",
+      "url": "https://doi.org/10.1016/j.heliyon.2023.e14265"
+    }
+  ],
+  "known_issues": [
+    {
+      "category": "rw_reason",
+      "desc": "Concerns/Issues about Image;Investigation by Journal/Publisher;Lack of IRB/IACUC Approval and/or Compliance;Manipulation of Images;Unreliable Results and/or Conclusions;"
+    }
+  ],
+  "expected_detectors": [
+    "image_dup",
+    "wb_clone"
+  ],
+  "pdf_path": "cases/pdfs/rw_10_1016_j_heliyon_2023_e14265.pdf",
+  "notes": "PDF 由使用者通过合法渠道(机构订阅 / 开放获取版本)获取后放到 pdf_path"
+}

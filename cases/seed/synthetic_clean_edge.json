@@ -1,0 +1,10 @@
+{
+  "id": "synthetic_clean_edge",
+  "title": "干净边角样本 — 含一致的统计/混合数字,验证不误报",
+  "verdict": "clean_control",
+  "sources": [],
+  "known_issues": [],
+  "expected_detectors": [],
+  "text_path": "samples/demo_edge_cases.txt",
+  "notes": "干净论文的边角情形"
+}

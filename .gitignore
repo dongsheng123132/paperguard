@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.venv/
+venv/
+.coverage
+htmlcov/
+
+# 用户上传 / 第三方论文 PDF — 版权与隐私
+cases/pdfs/
+*.pdf
+!samples/demo_fraud.pdf
+
+# Retraction Watch 缓存(8MB+,可重新下载)
+cases/rw_cache.csv
+cases/reports/
+
+# 生成的报告
+samples/*.paperguard.html
+samples/*_report.html
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

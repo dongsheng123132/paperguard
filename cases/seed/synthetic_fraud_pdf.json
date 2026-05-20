@@ -1,0 +1,13 @@
+{
+  "id": "synthetic_fraud_pdf",
+  "title": "PaperGuard 合成 PDF — 含翻转复用 + 内部 copy-move",
+  "verdict": "synthetic",
+  "sources": [],
+  "known_issues": [
+    {"category": "image_dup", "desc": "Fig 1 与 Fig 2 水平翻转复用"},
+    {"category": "wb_clone", "desc": "Fig 4 内部 96x96 块被 copy-paste 到两处"}
+  ],
+  "expected_detectors": ["image_dup", "wb_clone"],
+  "pdf_path": "samples/demo_fraud.pdf",
+  "notes": "由 samples/make_fraud_pdf.py 生成"
+}
