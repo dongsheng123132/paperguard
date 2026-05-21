@@ -93,7 +93,17 @@ samples/        # 论文样本(测试用)
 
 ## 在线体验
 
-- 🤗 Hugging Face Spaces (本仓库自动部署)
+- 🤗 Hugging Face Spaces: <https://huggingface.co/spaces/hefs/paperguard>
+- 📦 GitHub: <https://github.com/dongsheng123132/paperguard>
+
+## Contributing
+
+欢迎 PR 和 issue。开始之前请:
+
+1. `pip install -r requirements.txt && pip install pytest`
+2. `python -m pytest paperguard/tests/ -q` 必须全绿
+3. 加新检测器请同时提供至少一个 positive + 一个 negative 测试,详见 `ARCHITECTURE.md`
+4. 不要把任何真实他人论文 PDF 提交到仓库(版权 + 隐私)
 
 ## License
 

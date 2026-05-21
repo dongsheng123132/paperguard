@@ -22,6 +22,10 @@ cases/reports/
 samples/*.paperguard.html
 samples/*_report.html
 
+# Streamlit 本地运行日志
+streamlit.out.log
+streamlit.err.log
+
 # IDE / OS
 .idea/
 .vscode/
