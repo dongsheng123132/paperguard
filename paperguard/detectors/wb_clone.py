@@ -52,6 +52,9 @@ def _looks_like_vector_figure(rgb: Image.Image, gray_arr: np.ndarray) -> bool:
     # 白底彩色图表即使有少量填充块,也不是 WB copy-move 的适用对象。
     if white_ratio > 0.55 and colorful_ratio > 0.03 and dark_ratio < 0.15:
         return True
+    # 深色渐变背景 + 大量彩色矢量元素通常是机制示意图,不是显微图。
+    if dark_ratio > 0.60 and colorful_ratio > 0.35 and dominant_ratio < 0.10:
+        return True
     return False
 
 

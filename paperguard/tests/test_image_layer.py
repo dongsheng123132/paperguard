@@ -61,6 +61,30 @@ def test_wb_clone_saturation_is_ignored():
     assert not findings
 
 
+def test_wb_clone_skips_colorful_schematic():
+    import io
+    import numpy as np
+    from PIL import Image, ImageDraw
+    from paperguard.core.images import ExtractedImage
+    from paperguard.detectors.wb_clone import _scan_single
+
+    h, w = 512, 768
+    y = np.linspace(20, 80, h, dtype=np.uint8)[:, None]
+    arr = np.repeat(y, w, axis=1)
+    rgb = np.dstack([arr + 40, arr // 2, arr + 80]).astype(np.uint8)
+    pil = Image.fromarray(rgb, mode="RGB")
+    draw = ImageDraw.Draw(pil)
+    for x in range(80, 650, 140):
+        draw.ellipse([x, 90, x + 120, 170], fill=(245, 210, 10), outline=(255, 255, 0), width=3)
+        draw.text((x + 20, 130), "NRF2", fill=(255, 255, 255))
+    for x in range(100, 620, 120):
+        draw.line([x, 260, x + 90, 210], fill=(255, 0, 0), width=8)
+    buf = io.BytesIO()
+    pil.save(buf, format="PNG")
+    img = ExtractedImage(page=1, index=0, bytes_png=buf.getvalue(), width=w, height=h)
+    assert not _scan_single(img)
+
+
 def test_full_pipeline_pdf_has_image_findings():
     _ensure_pdf()
     rpt = analyze(str(PDF))
