@@ -25,14 +25,47 @@ NEIGHBOR = 2  # 块距小于该值的不算
 SATURATION_PAIRS = 15000  # 超过此数视为图本身有规则重复纹理(柱状图坐标轴/表格),降级为提示
 
 
+def _looks_like_vector_figure(rgb: Image.Image, gray_arr: np.ndarray) -> bool:
+    """跳过统计图、流程图、Logo 这类矢量/排版图。
+
+    wb_clone 的目标是凝胶、WB、显微图里的局部复制。普通图表里大量白底、
+    坐标轴、文字和重复线框会制造很多相同小块,继续扫描只会抬高误报。
+    """
+    arr = np.asarray(rgb.convert("RGB"))
+    maxc = arr.max(axis=2).astype(np.int16)
+    minc = arr.min(axis=2).astype(np.int16)
+    saturation = maxc - minc
+    white_ratio = np.all(arr > 245, axis=2).mean()
+    near_white_ratio = np.all(arr > 235, axis=2).mean()
+    dark_ratio = (gray_arr < 80).mean()
+    mid_ratio = ((gray_arr >= 80) & (gray_arr <= 235)).mean()
+    colorful_ratio = (saturation > 50).mean()
+    hist = np.bincount(gray_arr.ravel(), minlength=256)
+    dominant_ratio = hist.max() / gray_arr.size
+
+    # 白底彩色/黑色统计图、箱线图、折线图。
+    if near_white_ratio > 0.80 and mid_ratio < 0.15:
+        return True
+    # 灰底流程图/信息图:大面积同色底 + 少量文字/边框。
+    if dominant_ratio > 0.25 and dark_ratio < 0.10 and (white_ratio > 0.25 or mid_ratio > 0.50):
+        return True
+    # 白底彩色图表即使有少量填充块,也不是 WB copy-move 的适用对象。
+    if white_ratio > 0.55 and colorful_ratio > 0.03 and dark_ratio < 0.15:
+        return True
+    return False
+
+
 def _scan_single(img: ExtractedImage) -> list[Finding]:
     try:
-        pil = Image.open(io.BytesIO(img.bytes_png)).convert("L")
+        rgb = Image.open(io.BytesIO(img.bytes_png)).convert("RGB")
+        pil = rgb.convert("L")
     except Exception:  # noqa: BLE001
         return []
     arr = np.asarray(pil)
     h, w = arr.shape
     if h < BLOCK * 4 or w < BLOCK * 4:
+        return []
+    if _looks_like_vector_figure(rgb, arr):
         return []
     rows = h // BLOCK
     cols = w // BLOCK
@@ -63,24 +96,17 @@ def _scan_single(img: ExtractedImage) -> list[Finding]:
         # 少量孤立命中可能是巧合,要至少 2 对克隆才报
         return []
 
-    overlay = _annotate(pil, cloned_pairs)
     n_pairs = len(cloned_pairs)
     if n_pairs >= SATURATION_PAIRS:
-        severity = Severity.LOW
-        confidence = 0.3
-        title = "图片含大量重复纹理"
-        detail = (
-            f"P{img.page}#{img.index}: 检测到 {n_pairs} 对相同指纹块,远超 copy-move 典型范围。"
-            "更可能是图本身含规则重复纹理(柱状图坐标轴 / 表格背景 / 染色斑块均匀),需人工复核。"
-        )
-    else:
-        severity = Severity.HIGH
-        confidence = 0.75
-        title = "图片内部疑似克隆 (copy-move)"
-        detail = (
-            f"P{img.page}#{img.index}: 检测到 {n_pairs} 对非相邻区块的指纹完全相同。"
-            "在 Western blot / 凝胶图中,这是把同一条带 copy-paste 到不同泳道的典型造假特征。"
-        )
+        return []
+    overlay = _annotate(pil, cloned_pairs)
+    severity = Severity.HIGH
+    confidence = 0.75
+    title = "图片内部疑似克隆 (copy-move)"
+    detail = (
+        f"P{img.page}#{img.index}: 检测到 {n_pairs} 对非相邻区块的指纹完全相同。"
+        "在 Western blot / 凝胶图中,这是把同一条带 copy-paste 到不同泳道的典型造假特征。"
+    )
     return [
         Finding(
             detector=DETECTOR,

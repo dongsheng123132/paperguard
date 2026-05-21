@@ -38,8 +38,8 @@ def test_wb_clone_finds_internal_copy():
     assert f.severity.value == "high"
 
 
-def test_wb_clone_saturation_downgrades_to_low():
-    """图本身富含规则纹理时 (pairs >= SATURATION_PAIRS),应降级为 LOW + 低 confidence."""
+def test_wb_clone_saturation_is_ignored():
+    """图本身富含规则纹理时 (pairs >= SATURATION_PAIRS),不应报 copy-move 疑点。"""
     import io
     import numpy as np
     from PIL import Image
@@ -56,12 +56,9 @@ def test_wb_clone_saturation_downgrades_to_low():
         page=1, index=0, bytes_png=buf.getvalue(),
         width=big.shape[1], height=big.shape[0],
     )
+    assert SATURATION_PAIRS > 0
     findings = _scan_single(img)
-    assert findings, "饱和情况仍应产出 finding(只是降级)"
-    f = findings[0]
-    assert f.metadata["pairs"] >= SATURATION_PAIRS
-    assert f.severity.value == "low"
-    assert f.confidence < 0.5
+    assert not findings
 
 
 def test_full_pipeline_pdf_has_image_findings():

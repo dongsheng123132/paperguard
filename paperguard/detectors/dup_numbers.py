@@ -23,6 +23,16 @@ _NUM_RE = re.compile(r"-?\d+\.\d+")
 # 段落切分: 空行 + 编号
 _PARA_SPLIT = re.compile(r"\n\s*\n+")
 
+# DOI 前缀(出版社代码),例: 10.3389/fphys.2020.01092 → 整段都不该参与
+_DOI_RE = re.compile(r"\b10\.\d{4,9}/[\w\-./;()]+", re.IGNORECASE)
+# 期刊页眉页脚标志词
+_JOURNAL_CRUFT = re.compile(
+    r"\b(?:Article\s+(?:ID|No\.?)|Volume\s+\d+|Issue\s+\d+|Frontiers\s+in|"
+    r"www\.[a-z]+\.(?:com|org)|doi:|https?://|©\s*\d{4}|"
+    r"Journal\s+of\s+|Manuscript\s+received)\b",
+    re.IGNORECASE,
+)
+
 
 @dataclass
 class _Para:
@@ -30,12 +40,73 @@ class _Para:
     idx: int
     text: str
     numbers: list[float]
+    table_like: bool = False
+
+
+def _clean_for_numbers(text: str) -> str:
+    """剔除 DOI / URL / 期刊页眉页脚行,避免它们里的数字被当成数据。"""
+    # 1) 先去 DOI 整串
+    text = _DOI_RE.sub(" ", text)
+    # 2) 再按行过滤明显的期刊 cruft(整行都丢弃)
+    kept = []
+    for line in text.splitlines():
+        if _JOURNAL_CRUFT.search(line):
+            continue
+        kept.append(line)
+    return "\n".join(kept)
+
+
+def _strip_repeated_lines(doc: Document, min_pages: int = 3) -> dict[int, str]:
+    """跨页重复出现的短行视为页眉页脚,逐页剔除后返回 {page: cleaned_text}."""
+    # 统计每行(<=120 字)出现在多少不同页
+    page_lines: dict[int, list[str]] = {}
+    occur: Counter = Counter()
+    for page in doc.pages:
+        lines = [l.strip() for l in page.text.splitlines()]
+        page_lines[page.page] = lines
+        for l in set(l for l in lines if 4 <= len(l) <= 120):
+            occur[l] += 1
+    repeated = {l for l, n in occur.items() if n >= min_pages}
+    out: dict[int, str] = {}
+    for pg, lines in page_lines.items():
+        kept = [l for l in lines if l.strip() not in repeated]
+        out[pg] = "\n".join(kept)
+    return out
+
+
+def _is_table_like(text: str) -> bool:
+    """识别 PDF 表格抽取后的伪段落,这类文本需要更强证据才报警。"""
+    lower = text.lower()
+    if lower.lstrip().startswith(("table ", "figure ", "fig. ", "fig ")):
+        return True
+    table_markers = (
+        "p-value",
+        "p value",
+        "mean ±",
+        "sd ",
+        "standard deviation",
+        "confidence interval",
+        "bias square",
+        "baseline characteristics",
+    )
+    marker_hits = sum(1 for marker in table_markers if marker in lower)
+    numeric_hits = len(_NUM_RE.findall(text))
+    if marker_hits >= 1 and numeric_hits >= 8:
+        return True
+    tokens = re.findall(r"[A-Za-z]+|-?\d+\.\d+|±|—", text)
+    if numeric_hits >= 12 and tokens:
+        numeric_density = numeric_hits / len(tokens)
+        if numeric_density >= 0.35 or text.count("±") >= 4:
+            return True
+    return False
 
 
 def _to_paragraphs(doc: Document) -> list[_Para]:
+    cleaned_pages = _strip_repeated_lines(doc)
     paras: list[_Para] = []
     for page in doc.pages:
-        for i, raw in enumerate(_PARA_SPLIT.split(page.text)):
+        page_text = _clean_for_numbers(cleaned_pages.get(page.page, page.text))
+        for i, raw in enumerate(_PARA_SPLIT.split(page_text)):
             t = raw.strip()
             if len(t) < 40:
                 continue
@@ -43,7 +114,7 @@ def _to_paragraphs(doc: Document) -> list[_Para]:
             # 仅保留含 ≥4 个数字的段落,否则没意义
             if len(nums) < 4:
                 continue
-            paras.append(_Para(page=page.page, idx=i, text=t, numbers=nums))
+            paras.append(_Para(page=page.page, idx=i, text=t, numbers=nums, table_like=_is_table_like(t)))
     return paras
 
 
@@ -89,14 +160,30 @@ def _internal_repeat(numbers: list[float], k: int = 4) -> tuple[int, list[float]
     return best
 
 
+def _low_information_sequence(seq: list[float]) -> bool:
+    """跳过 p 值阈值、显著性星号说明等低信息重复。"""
+    rounded = [round(x, 6) for x in seq]
+    uniq = set(rounded)
+    if len(uniq) <= 2 and all(abs(x) <= 0.1 for x in uniq):
+        return True
+    common_thresholds = {0.001, 0.01, 0.05}
+    if uniq and uniq.issubset(common_thresholds):
+        return True
+    return False
+
+
 def _scan(doc: Document, jaccard_threshold: float = 0.6, min_overlap: int = 5) -> list[Finding]:
     paras = _to_paragraphs(doc)
     out: list[Finding] = []
-    # 段落内自重复
+    # 段落内自重复 — k=5 是经验值:k=4 会被 "p<0.05" 多次提及触发假阳性
     for p in paras:
-        rep = _internal_repeat(p.numbers, k=4)
+        rep = _internal_repeat(p.numbers, k=5)
         if rep:
             m, seq, _start = rep
+            if _low_information_sequence(seq):
+                continue
+            if p.table_like and m < 8:
+                continue
             out.append(
                 Finding(
                     detector=DETECTOR,
@@ -125,6 +212,11 @@ def _scan(doc: Document, jaccard_threshold: float = 0.6, min_overlap: int = 5) -
             consec = _consecutive_match(a.numbers, b.numbers, k=3)
             if jac < jaccard_threshold and consec is None:
                 continue
+            if consec and _low_information_sequence(consec[1]):
+                continue
+            if a.table_like or b.table_like:
+                if consec is None or consec[0] < 8 or jac < 0.2:
+                    continue
             severity = Severity.HIGH if consec and consec[0] >= 5 else Severity.MEDIUM
             sample = sorted(overlap, key=lambda x: -abs(x))[:6]
             detail = (

@@ -67,12 +67,15 @@ python -m cases.benchmark
 | 子集 | 案例数 | precision | recall | F1 |
 |---|---|---|---|---|
 | 合成样本(假 vs 干净) | 5 | 100% | 100% | 100% |
-| 真实 Frontiers(4 退稿 + 2 控制组) | 6 | 67% | 100% | 80% |
-| **合计** | 11 (+5 PDF 待补) | **75%** | **100%** | **86%** |
+| 真实 Frontiers(4 退稿 + 2 控制组) | 6 | 100% | 75% | 86% |
+| **合计** | 11 (+5 PDF 待补) | **100%** | **83%** | **91%** |
 
-> 真实数据的 2 个 false positive 都在控制组 — wb_clone 在含有大量规则纹理的图(柱状图坐标轴 / 染色斑块均匀)上仍会触发,
-> 当前阈值已对 `pairs ≥ 15000` 的"饱和"情况降级为 LOW + confidence 0.3 以提示人工复核。
-> 真实场景下请把 wb_clone 的 HIGH 结果作为**提示**而非结论。
+> **真实数据 0 个 false positive**(对照组 risk 均压到 0),但代价是 1 个 false negative
+> (rw_70593 真退稿但图像层被"白底矢量图"过滤跳过,risk=0)。
+> 这反映了 wb_clone/dup_numbers 在保守与激进之间的取舍 —
+> **当前默认偏保守(宁可漏报不要误报)**,真实使用建议同时人工浏览图像。
+
+样本报告参见 [`cases/reports/frontiers_batch/`](cases/reports/frontiers_batch/)。
 
 ## 本地运行
 
