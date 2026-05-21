@@ -22,6 +22,7 @@ DETECTOR = "wb_clone"
 BLOCK = 32
 MIN_VAR = 50  # 像素方差阈值,低于则视为均匀背景
 NEIGHBOR = 2  # 块距小于该值的不算
+SATURATION_PAIRS = 15000  # 超过此数视为图本身有规则重复纹理(柱状图坐标轴/表格),降级为提示
 
 
 def _scan_single(img: ExtractedImage) -> list[Finding]:
@@ -63,20 +64,34 @@ def _scan_single(img: ExtractedImage) -> list[Finding]:
         return []
 
     overlay = _annotate(pil, cloned_pairs)
+    n_pairs = len(cloned_pairs)
+    if n_pairs >= SATURATION_PAIRS:
+        severity = Severity.LOW
+        confidence = 0.3
+        title = "图片含大量重复纹理"
+        detail = (
+            f"P{img.page}#{img.index}: 检测到 {n_pairs} 对相同指纹块,远超 copy-move 典型范围。"
+            "更可能是图本身含规则重复纹理(柱状图坐标轴 / 表格背景 / 染色斑块均匀),需人工复核。"
+        )
+    else:
+        severity = Severity.HIGH
+        confidence = 0.75
+        title = "图片内部疑似克隆 (copy-move)"
+        detail = (
+            f"P{img.page}#{img.index}: 检测到 {n_pairs} 对非相邻区块的指纹完全相同。"
+            "在 Western blot / 凝胶图中,这是把同一条带 copy-paste 到不同泳道的典型造假特征。"
+        )
     return [
         Finding(
             detector=DETECTOR,
-            severity=Severity.HIGH,
-            title="图片内部疑似克隆 (copy-move)",
-            detail=(
-                f"P{img.page}#{img.index}: 检测到 {len(cloned_pairs)} 对非相邻区块的指纹完全相同。"
-                "在 Western blot / 凝胶图中,这是把同一条带 copy-paste 到不同泳道的典型造假特征。"
-            ),
+            severity=severity,
+            title=title,
+            detail=detail,
             snippet="",
             page=img.page,
-            confidence=0.75,
+            confidence=confidence,
             metadata={
-                "pairs": len(cloned_pairs),
+                "pairs": n_pairs,
                 "image_size": [img.width, img.height],
                 "annotated_b64": overlay,
                 "page_image": img.page,

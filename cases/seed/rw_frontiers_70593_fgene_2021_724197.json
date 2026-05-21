@@ -1,0 +1,20 @@
+{
+  "id": "rw_frontiers_70593_fgene_2021_724197",
+  "title": "Frontiers fgene 2021 #724197",
+  "year": 2021,
+  "journal": "Frontiers in Genetics",
+  "verdict": "retracted",
+  "sources": [],
+  "known_issues": [
+    {
+      "category": "rw_reason",
+      "desc": "Retracted by Frontiers — image / data integrity concerns"
+    }
+  ],
+  "expected_detectors": [
+    "image_dup",
+    "wb_clone"
+  ],
+  "pdf_path": "cases/pdfs/rw_frontiers_70593_fgene_2021_724197.pdf",
+  "notes": "Frontiers 退稿真实案例;具体退稿原因以 Retraction Watch / 期刊 retraction notice 为准"
+}

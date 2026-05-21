@@ -62,8 +62,17 @@ python -m cases.fetch_retraction_watch --email you@example.com \
 python -m cases.benchmark
 ```
 
-合成样本上当前指标: **precision 100% · recall 100% · F1 100%**
-(5 个合成假/干净样本 · 真实退稿案例待 PDF 就绪)
+当前指标:
+
+| 子集 | 案例数 | precision | recall | F1 |
+|---|---|---|---|---|
+| 合成样本(假 vs 干净) | 5 | 100% | 100% | 100% |
+| 真实 Frontiers(4 退稿 + 2 控制组) | 6 | 67% | 100% | 80% |
+| **合计** | 11 (+5 PDF 待补) | **75%** | **100%** | **86%** |
+
+> 真实数据的 2 个 false positive 都在控制组 — wb_clone 在含有大量规则纹理的图(柱状图坐标轴 / 染色斑块均匀)上仍会触发,
+> 当前阈值已对 `pairs ≥ 15000` 的"饱和"情况降级为 LOW + confidence 0.3 以提示人工复核。
+> 真实场景下请把 wb_clone 的 HIGH 结果作为**提示**而非结论。
 
 ## 本地运行
 

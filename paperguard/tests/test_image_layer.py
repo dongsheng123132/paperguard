@@ -32,7 +32,36 @@ def test_wb_clone_finds_internal_copy():
     _ensure_pdf()
     res = wb_clone.run_from_pdf(str(PDF))
     assert res.findings, "应抓到内部 copy-move"
-    assert res.findings[0].metadata["pairs"] >= 2
+    f = res.findings[0]
+    assert f.metadata["pairs"] >= 2
+    # 合成样本 pair 数远低于饱和阈值,应保持 HIGH severity
+    assert f.severity.value == "high"
+
+
+def test_wb_clone_saturation_downgrades_to_low():
+    """图本身富含规则纹理时 (pairs >= SATURATION_PAIRS),应降级为 LOW + 低 confidence."""
+    import io
+    import numpy as np
+    from PIL import Image
+    from paperguard.core.images import ExtractedImage
+    from paperguard.detectors.wb_clone import _scan_single, SATURATION_PAIRS
+
+    # 构造高纹理但规则重复的灰度图:把 64x64 的随机块在 16x16 网格中重复
+    rng = np.random.default_rng(42)
+    tile = (rng.integers(0, 256, size=(64, 64), dtype=np.uint8))
+    big = np.tile(tile, (16, 16))  # 1024x1024,16*16=256 块同样的内容
+    buf = io.BytesIO()
+    Image.fromarray(big).save(buf, format="PNG")
+    img = ExtractedImage(
+        page=1, index=0, bytes_png=buf.getvalue(),
+        width=big.shape[1], height=big.shape[0],
+    )
+    findings = _scan_single(img)
+    assert findings, "饱和情况仍应产出 finding(只是降级)"
+    f = findings[0]
+    assert f.metadata["pairs"] >= SATURATION_PAIRS
+    assert f.severity.value == "low"
+    assert f.confidence < 0.5
 
 
 def test_full_pipeline_pdf_has_image_findings():

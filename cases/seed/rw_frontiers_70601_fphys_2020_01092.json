@@ -1,0 +1,20 @@
+{
+  "id": "rw_frontiers_70601_fphys_2020_01092",
+  "title": "Frontiers fphys 2020 #01092",
+  "year": 2020,
+  "journal": "Frontiers in Physiology",
+  "verdict": "retracted",
+  "sources": [],
+  "known_issues": [
+    {
+      "category": "rw_reason",
+      "desc": "Retracted by Frontiers — image / data integrity concerns"
+    }
+  ],
+  "expected_detectors": [
+    "image_dup",
+    "wb_clone"
+  ],
+  "pdf_path": "cases/pdfs/rw_frontiers_70601_fphys_2020_01092.pdf",
+  "notes": "Frontiers 退稿真实案例;具体退稿原因以 Retraction Watch / 期刊 retraction notice 为准"
+}

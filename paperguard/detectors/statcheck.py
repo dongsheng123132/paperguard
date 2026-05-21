@@ -22,9 +22,9 @@ from ..core.types import DetectorResult, Finding, Severity
 DETECTOR = "statcheck"
 
 
-# 允许 = ≈ < > ≤ ≥
-_OP = r"(?:[=≈<>≤≥]|<=|>=)"
-_NUM = r"-?\d+(?:\.\d+)?"
+# 允许 = ≈ < > ≤ ≥；先匹配双字符操作符，避免把 "<=" 截成 "<"。
+_OP = r"(?:<=|>=|[=≈<>≤≥])"
+_NUM = r"-?(?:\d+(?:\.\d+)?|\.\d+)"
 
 # t(df) = stat, p = pval
 _T_RE = re.compile(

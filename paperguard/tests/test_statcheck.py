@@ -28,6 +28,14 @@ def test_F_decision_flip():
     assert res.findings[0].metadata["decision_flip"] is True
 
 
+def test_leading_decimal_and_double_char_operator():
+    # 论文里常见 p <= .01 / p = .05 这种省略前导 0 的写法。
+    doc = _doc("ANOVA, F(2, 21) = 1.20, p <= .01.")
+    res = statcheck.run(doc)
+    assert res.findings
+    assert res.findings[0].metadata["decision_flip"] is True
+
+
 def test_chi2_inconsistent():
     # chi2(3)=7.81, p≈0.05; 报告 p=0.001 显著偏低
     doc = _doc("chi2(3) = 7.81, p = 0.001.")

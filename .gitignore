@@ -26,6 +26,10 @@ samples/*_report.html
 streamlit.out.log
 streamlit.err.log
 
+# 本地探索时的临时输出
+test_outputs/
+新建 文本文档.txt
+
 # IDE / OS
 .idea/
 .vscode/

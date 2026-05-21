@@ -1,0 +1,20 @@
+{
+  "id": "rw_frontiers_70594_fonc_2021_616390",
+  "title": "Frontiers fonc 2021 #616390",
+  "year": 2021,
+  "journal": "Frontiers in Oncology",
+  "verdict": "retracted",
+  "sources": [],
+  "known_issues": [
+    {
+      "category": "rw_reason",
+      "desc": "Retracted by Frontiers — image / data integrity concerns"
+    }
+  ],
+  "expected_detectors": [
+    "image_dup",
+    "wb_clone"
+  ],
+  "pdf_path": "cases/pdfs/rw_frontiers_70594_fonc_2021_616390.pdf",
+  "notes": "Frontiers 退稿真实案例;具体退稿原因以 Retraction Watch / 期刊 retraction notice 为准"
+}

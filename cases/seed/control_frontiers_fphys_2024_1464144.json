@@ -1,0 +1,12 @@
+{
+  "id": "control_frontiers_fphys_2024_1464144",
+  "title": "Frontiers fphys 2024 #1464144",
+  "year": 2024,
+  "journal": "Frontiers in Physiology",
+  "verdict": "clean_control",
+  "sources": [],
+  "known_issues": [],
+  "expected_detectors": [],
+  "pdf_path": "cases/pdfs/control_frontiers_fphys_2024_1464144.pdf",
+  "notes": "Frontiers 近期同期刊正常论文,用作 clean control"
+}
