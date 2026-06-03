@@ -16,11 +16,17 @@ cases/pdfs/
 
 # Retraction Watch 缓存(8MB+,可重新下载)
 cases/rw_cache.csv
-# 默认忽略 reports 产物(大,可重新生成),但保留 frontiers_batch md 作开源验证证据
+# 默认忽略 reports 产物(大,可重新生成),但保留示例 md 作开源验证证据
 cases/reports/*
 !cases/reports/frontiers_batch/
 cases/reports/frontiers_batch/*
 !cases/reports/frontiers_batch/*.md
+!cases/reports/kingfa_corpus/
+cases/reports/kingfa_corpus/*
+!cases/reports/kingfa_corpus/*.md
+
+# OA 深扫下载的 PDF 缓存(版权,跑完即弃;PDF 已被上面 *.pdf 全局忽略)
+cases/oa_cache/
 
 # 生成的报告
 samples/*.paperguard.html

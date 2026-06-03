@@ -32,13 +32,40 @@ def _verdict(score: float) -> tuple[str, str]:
     return ("✅ 未发现明显异常", "本工具未发现可识别的不一致 — 不等于论文无问题。")
 
 
+def _report_verdict(report: Report) -> tuple[str, str]:
+    """corpus 模式给"撤稿记录"语义的结论;单篇模式沿用基于分数的 _verdict。"""
+    if report.kind == "corpus":
+        # 撤稿记录(corpus_retraction)与 OA 深扫疑点(corpus_deepscan)是两条不同的轴,分开判
+        retr = {f.severity for f in report.findings if f.detector == "corpus_retraction"}
+        deep = {f.severity for f in report.findings if f.detector == "corpus_deepscan"}
+        if Severity.CRITICAL in retr or Severity.HIGH in retr:
+            return ("⚠️ 发现已撤稿 / 被标记论文", "下方列出已撤稿或被标记的论文,请逐条人工复核原文与撤稿声明。")
+        if Severity.MEDIUM in retr:
+            return ("🟡 存在同名撤稿记录", "退稿库有同名机构/作者记录,但 DOI 未对上,需人工确认是否同一实体。")
+        if deep & {Severity.CRITICAL, Severity.HIGH, Severity.MEDIUM, Severity.LOW}:
+            return ("🟡 未见撤稿记录,但部分 OA 论文有疑点", "OA 深扫在部分论文里发现统计/图像疑点(非撤稿),建议人工复核原文。")
+        return ("✅ 公开撤稿库未见记录", "在 OpenAlex 与 Retraction Watch 中均未命中 — 仅代表公开撤稿记录层面合格,不等于每篇无问题。")
+    return _verdict(report.risk_score)
+
+
+def _scale_line(report: Report) -> str:
+    """报告头部的"规模"描述: 单篇按 页/词,corpus 按 实体名。"""
+    if report.kind == "corpus":
+        return f"机构 / 作者体检 · {report.subject or report.source}"
+    return f"{report.page_count} 页 / {report.word_count} 词"
+
+
+def _title_line(report: Report) -> str:
+    return "PaperGuard 机构 / 作者体检报告" if report.kind == "corpus" else "PaperGuard 论文体检报告"
+
+
 def to_markdown(report: Report) -> str:
-    verdict, advice = _verdict(report.risk_score)
+    verdict, advice = _report_verdict(report)
     lines = [
-        "# PaperGuard 论文体检报告",
+        f"# {_title_line(report)}",
         "",
         f"- **来源**: `{report.source}`",
-        f"- **规模**: {report.page_count} 页 / {report.word_count} 词",
+        f"- **规模**: {_scale_line(report)}",
         f"- **风险评分**: **{report.risk_score}**",
         f"- **结论**: {verdict} — {advice}",
         "",
@@ -77,7 +104,7 @@ def to_markdown(report: Report) -> str:
 
 
 def to_html(report: Report) -> str:
-    verdict, advice = _verdict(report.risk_score)
+    verdict, advice = _report_verdict(report)
     cards: list[str] = []
     for f in report.findings:
         color = _SEV_COLOR[f.severity]
@@ -144,8 +171,8 @@ def to_html(report: Report) -> str:
 </style>
 </head>
 <body>
-  <h1>🛡️ PaperGuard 论文体检报告</h1>
-  <div class="meta">{escape(report.source)} — {report.page_count} 页 / {report.word_count} 词</div>
+  <h1>🛡️ {escape(_title_line(report))}</h1>
+  <div class="meta">{escape(report.source)} — {escape(_scale_line(report))}</div>
   <div class="summary">
     <div class="score">风险评分: {report.risk_score}</div>
     <div>{escape(verdict)} — {escape(advice)}</div>

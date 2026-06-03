@@ -26,7 +26,7 @@ short_description: 开源论文体检 — 统计自洽 / 数字一致 / 图片�
 4. 上传他人论文请确认**不侵犯版权**。本服务**不存储**用户上传的 PDF,跑完即弃。
 5. 本工具按"现状"提供,不对检测结果的准确性、完整性作任何保证。使用者自行承担一切责任。
 
-## 现阶段能做什么(v0.3)
+## 现阶段能做什么(v0.4)
 
 **文本统计层**
 - ✅ **StatCheck**: t/F/χ²/r 与 p 值自洽,标决策反转
@@ -37,9 +37,15 @@ short_description: 开源论文体检 — 统计自洽 / 数字一致 / 图片�
 - ✅ **image_dup**: pHash + ORB 二级验证,含水平/垂直翻转/180° 旋转复用
 - ✅ **wb_clone**: 32×32 分块自相关,捕获 WB 条带 copy-move
 
+**机构 / 作者层(v0.4 新增)**
+- ✅ **corpus_retraction**: 给机构名/作者名/OpenAlex ID,自动拉全部作品,用 OpenAlex `is_retracted` + 本地 Retraction Watch 库**三重交叉验证**撤稿记录,并给发文画像
+- ✅ 离线 DOI 模式: 只用本地退稿库核对一份 DOI 清单(不联网)
+- ✅ **OA 深扫(`--deep`)**: 对开放获取论文自动下 PDF,逐篇跑上面 5 个单篇检测器(`corpus_deepscan`)。只碰 OA、限速、跑完即弃
+- ✅ 作为 Agent Skill 暴露(`skills/paperguard_corpus_scan/SKILL.md`,仿 google-deepmind/science-skills),Claude Code / Antigravity 可直接驱动
+
 **通用**
 - ✅ CLI / Markdown / HTML / JSON 多格式报告(带图片缩略图和克隆块标注)
-- ✅ Streamlit Web UI
+- ✅ Streamlit Web UI(单篇 / 机构两种模式)
 
 ## 路线图
 
@@ -48,6 +54,9 @@ short_description: 开源论文体检 — 统计自洽 / 数字一致 / 图片�
 - v0.3 — Retraction Watch 数据集 + 回测框架 ✅
 - v0.4 — 图表数值反向提取(WebPlotDigitizer 思路) + 相关性异常
 - v0.5 — 引文/作者关联(论文工厂识别)
+  - ✅ 机构/作者级撤稿核对(OpenAlex + Retraction Watch)已交付 — `paperguard scan`
+  - ✅ OA 论文自动深扫已交付 — `paperguard scan --deep`
+  - ⏳ PubPeer 接入 / 论文工厂指纹 / 图像检测器降误报(WB copy-move 在材料·化学图上易误报)
 
 ## 回测(v0.3)
 
@@ -90,19 +99,37 @@ python -m paperguard check samples/demo_fraud.pdf
 
 # 3. Web 体检
 streamlit run paperguard/web/app.py
+
+# 4. 机构 / 作者体检(查公开撤稿记录)
+python -m paperguard scan --institution "Kingfa" --mailto you@example.com
+python -m paperguard scan --author "某作者" -f md -o report.md
+python -m paperguard scan --doi-file dois.txt          # 离线: 只核对本地退稿库
+# CN 网络访问 OpenAlex 可加 --proxy http://127.0.0.1:7897
+
+# 4b. 深扫: 对开放获取(OA)论文下 PDF 逐篇查(慢;疑点 ≠ 撤稿,均需人工复核)
+python -m paperguard scan --institution "Kingfa" --deep --max-pdfs 5
 ```
+
+> 机构/作者体检样例: [`cases/reports/kingfa_corpus/`](cases/reports/kingfa_corpus/)
+> —— 对金发科技(305 篇)的真实体检,公开撤稿库 0 命中,结论"合格"。
+>
+> ⚠️ `--deep` 的图像检测器(尤其 `wb_clone` copy-move)在**材料 / 化学类**图(大面积均匀背景、
+> 发光照片、CIE 色度图)上**容易误报**。深扫疑点一律按"疑似"对待,**必须人工核对原图**,
+> 不可作为指控依据。降低这类误报是下一步重点。
 
 ## 项目结构
 
 ```
 paperguard/
   core/         # PDF 文本抽取、数字清洗、共用类型
-  detectors/    # 各类检测器 (statcheck / grim / dup_numbers / ...)
+  detectors/    # 单篇检测器 (statcheck / grim / dup_numbers / image_dup / wb_clone)
+  corpus/       # 机构/作者级体检 (openalex + retraction_watch + scan)
   report/       # JSON / Markdown / HTML 报告渲染
-  web/          # Streamlit 上传界面
+  web/          # Streamlit 界面(单篇 + 机构两种模式)
   tests/        # pytest 用例
 cases/          # 真实退稿论文回测框架
 samples/        # 论文样本(测试用)
+skills/         # Agent Skill(SKILL.md,仿 google-deepmind/science-skills)
 ```
 
 ## 在线体验

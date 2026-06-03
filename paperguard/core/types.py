@@ -39,6 +39,9 @@ class Report(BaseModel):
     word_count: int
     results: list[DetectorResult]
     risk_score: float = 0.0
+    # "paper" = 单篇 PDF/TXT 体检; "corpus" = 机构/作者级元数据体检
+    kind: str = "paper"
+    subject: str | None = None  # corpus 模式下的实体名(机构/作者)
 
     @property
     def findings(self) -> list[Finding]:
