@@ -12,6 +12,8 @@ short_description: 开源论文体检 — 统计自洽 / 数字一致 / 图片�
 
 # PaperGuard 论文体检 · 开源学术稳健性自检工具
 
+作者 / Author：贺去病（贺方升 / Dosen）· [hequbing.com](https://www.hequbing.com)
+
 > 给一份 PDF/TXT,自动扫描**统计自洽性、数字一致性、图片完整性**的潜在问题。
 >
 > 灵感来自 PubPeer、Elisabeth Bik、"耿同学讲故事"的工作方法。
